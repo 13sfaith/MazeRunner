@@ -76,7 +76,7 @@ class Maze {
 			case 'bottom':
 				neigbors[choice].walls.top = false;
 				cell.walls.bottom = false;
-				mazeGen(neigbors[choice]);
+				this.mazeGen(neigbors[choice]);
 				break;
 		}
 			
@@ -84,8 +84,8 @@ class Maze {
 
 	}
 
-	findUnvisitedNeigbors() {
-		let index = this.curCell.id;
+	findUnvisitedNeigbors(cell) {
+		let index = cell.id;
 
 		let neigbors = {};
 
