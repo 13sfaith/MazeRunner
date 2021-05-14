@@ -44,4 +44,10 @@ class Ship {
 
           turnShipLeft() { this.angle -= this.turnSpeed }
           turnShipRight() { this.angle += this.turnSpeed }
+
+          handleInput() {
+                    if (keyIsDown(65)){ this.turnShipLeft(); }
+                    if (keyIsDown(68)){ this.turnShipRight(); }
+                    if (keyIsDown(87)){ this.accelShip(); }
+          }
 }
