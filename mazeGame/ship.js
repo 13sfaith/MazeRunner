@@ -4,8 +4,10 @@ class Ship {
                     this.size = size;
                     this.vel = createVector(0.2, 0.2)
                     this.angle = 0;
-                    this.turnSpeed = 0.07;
-                    this.accel = 0.01;
+                    this.turnSpeed = 0.09;
+                    this.accel = 0.05;
+                    this.topSpeed = 0.75;
+                    this.drag = 0.99;
           }
 
           drawShip() {
@@ -34,12 +36,21 @@ class Ship {
           }
 
           updateShipPos() {
+                    this.vel.mult(this.drag);
                     this.pos.add(this.vel);
           }
 
           accelShip() {
                     this.vel.x += Math.cos(this.angle) * this.accel;
+                    if (this.vel.x > this.topSpeed)
+                              this.vel.x = this.topSpeed;
+                    if (this.vel.x < -this.topSpeed)
+                              this.vel.x = -this.topSpeed;
                     this.vel.y += Math.sin(this.angle) * this.accel;
+                    if (this.vel.y > this.topSpeed)
+                              this.vel.y = this.topSpeed;
+                    if (this.vel.y < -this.topSpeed)
+                              this.vel.y = -this.topSpeed;
           }
 
           turnShipLeft() { this.angle -= this.turnSpeed }
