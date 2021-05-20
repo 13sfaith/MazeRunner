@@ -14,7 +14,8 @@ class Maze {
 	populateCellList() {
 		for (let j = 0; j < this.rows; j++) {
 			for (let k = 0; k < this.cols; k++) {
-				this.cellList.push(new Cell(k + (j * this.cols)));
+				this.cellList.push(new Cell((k + (j * this.cols)), 
+					{left: k*this.size, right: (k+1)*this.size, top: j*this.size, bottom: (j+1)*this.size}));
 			}
 		}
 	}
