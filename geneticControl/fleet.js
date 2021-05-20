@@ -5,7 +5,8 @@ class Fleet {
 		this.deadList = [];
 		this.boundaryManager = boundaryManager;
 
-		this.weights = weights
+		this.weights = weights;
+		this.maxLife = 10;
 
 		this.canRespawn = false;
 
@@ -23,16 +24,21 @@ class Fleet {
 		let inputs = this.prepareInputs();
 		let control = [];
 		for (let i = 0; i < inputs.length; i++) {
-			let a = tf.tensor(inputs[i], [1, 15]);
+			let a = tf.tensor(inputs[i], [1, 16]);
 			let pred = this.fleetList[i].model.predict(a);
 			pred = pred.dataSync()
 			control.push(pred.indexOf(Math.max(...pred)));
+			//if (i == 0) console.log(pred);
 
 		}
 
 		if (this.fleetList.length == 0) {
-			let a = this.deadList[this.count - 1].model.getLayer(null, 1).getWeights();
-			let b = this.deadList[this.count - 2].model.getLayer(null, 1).getWeights();
+			let modelB = this.deadList[this.count - 1];
+			this.deadList.sort( (a, b) => { return a.finalDistance > b.finalDistance })
+			let modelA = this.deadList[this.count - 1]
+
+			let a = modelA.model.getLayer(null, 1).getWeights();
+			let b = modelB.model.getLayer(null, 1).getWeights();
 
 			//let weights0 = a[0].add(b[0]).div(tf.scalar(2));
 			//let weights1 = a[1].add(b[1]).div(tf.scalar(2));
@@ -40,14 +46,23 @@ class Fleet {
 			this.weights[0] = (a[0]);
 			this.weights[1] = (a[1]);
 
-			a = this.deadList[this.count - 1].model.getLayer(null, 2).getWeights();
-			b = this.deadList[this.count - 2].model.getLayer(null, 2).getWeights();
+			a = modelA.model.getLayer(null, 2).getWeights();
+			b = modelB.model.getLayer(null, 2).getWeights();
 
-			//weights0 = a[0].add(b[0]).div(tf.scalar(2));
-			//weights1 = a[1].add(b[1]).div(tf.scalar(2));
+			this.weights[2] = (b[0]);
+			this.weights[3] = (b[1]);
 
-			this.weights[2] = (a[0]);
-			this.weights[3] = (a[1]);
+			a = modelA.model.getLayer(null, 3).getWeights();
+			b = modelB.model.getLayer(null, 3).getWeights();
+
+			this.weights[4] = (a[0]);
+			this.weights[5] = (a[1]);
+
+			a = modelA.model.getLayer(null, 4).getWeights();
+			b = modelB.model.getLayer(null, 4).getWeights();
+
+			this.weights[6] = (b[0]);
+			this.weights[7] = (b[1]);
 
 			this.canRespawn = true;
 		}
@@ -62,9 +77,10 @@ class Fleet {
 		}
 
 		for (let i = 0; i < this.fleetList.length; i++) {
-			if (!this.boundaryManager.isSafe(this.fleetList[i])) {
-					this.deadList.push(this.fleetList[i]);
-					this.fleetList.splice(i, 1);
+			if (!this.boundaryManager.isSafe(this.fleetList[i]) || this.fleetList[i].stillCount > this.maxLife) {
+				this.fleetList[i].calculateDeathMag();
+				this.deadList.push(this.fleetList[i]);
+				this.fleetList.splice(i, 1);
 			}
 		}
 	}
@@ -74,12 +90,14 @@ class Fleet {
 		let inputs = [];
 		for (let i = 0; i < this.fleetList.length; i++) {	
 			let temp = [];
+			temp[0] = this.fleetList[i].stillCount / this.maxLife;
+
 			// angle of ship
-			temp[0] = this.fleetList[i].angle / (2 * PI);
+			temp[1] = this.fleetList[i].angle / (2 * PI);
 
 			// velocity of ship
-			temp[1] = this.fleetList[i].vel.x / this.fleetList[i].topSpeed
-			temp[2] = this.fleetList[i].vel.y / this.fleetList[i].topSpeed
+			temp[2] = this.fleetList[i].vel.x / this.fleetList[i].topSpeed
+			temp[3] = this.fleetList[i].vel.y / this.fleetList[i].topSpeed
 
 			// points of ship
 			let points = this.boundaryManager.getNormalizedDistance(this.fleetList[i]);

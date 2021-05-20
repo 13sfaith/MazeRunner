@@ -5,12 +5,13 @@ let tempWeights = [];
 
 function rebuildLevel() {
 	stroke(255);
-	maze = new Maze(15, 15, 48);
+	maze = new Maze(10, 10, 72);
 	maze.mazeGen(maze.cellList[0]);
 
 	bounds = new BoundaryManager(maze);
 
 	fleet = new Fleet(10, bounds, tempWeights);
+
 }
 
 function setup() {
@@ -21,6 +22,8 @@ function setup() {
 }
 
 
+let epoch = 0;
+let iterations = 100;
 function draw() {
 	background(30);
 	maze.drawToScreen();
@@ -28,6 +31,8 @@ function draw() {
 	fleet.handleDraw();
 
 	if (fleet.canRespawn) {
+		epoch++;
+		console.log(`Epoch: ${epoch}`);
 		tempWeights = fleet.weights;
 		rebuildLevel();
 	}

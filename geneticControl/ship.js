@@ -1,39 +1,84 @@
 class Ship {
 	constructor(pos, size = 9, weights) {
 		this.pos = pos;
+		this.startingPos = createVector(pos.x, pos.y);
+		this.finalDistance = createVector(0, 0);
 		this.size = size;
-		this.vel = createVector(0.2, 0.2)
-		this.angle = 0;
-		this.turnSpeed = 0.09;
+		this.vel = createVector(0.0, 0.0); 
+		this.angle = Math.random() * (2 * PI);
+		this.turnSpeed = 0.08;
 		this.accel = 0.05;
-		this.topSpeed = 0.75;
+		this.topSpeed = 0.35;
 		this.drag = 0.99;
+		this.stillCount = 0;
 		this.points = { left: createVector(0, 0), right: createVector(0, 0), 
 			top: createVector(0, 0), bottom: createVector(0, 0) };
+
+		this.fill = '#fff';
+			
+		this.MutationRate = .001;
+		this.MutationChance = 7;
 		this.model = tf.sequential({
 			layers: [
-				tf.layers.dense({batchInputShape: [1, 15], units: 30, activation: 'sigmoid'}),
-				tf.layers.dense({units: 55, activation: 'hardSigmoid'}),
-				tf.layers.dense({units: 40, activation: 'hardSigmoid'}),
-				tf.layers.dense({units: 4, activation: 'sigmoid'}),
+				tf.layers.dense({batchInputShape: [1, 16], units: 30, activation: 'elu'}),
+				tf.layers.dense({units: 75, activation: 'relu'}),
+				tf.layers.dense({units: 85, activation: 'relu'}),
+				tf.layers.dense({units: 85, activation: 'relu'}),
+				tf.layers.dense({units: 70, activation: 'relu'}),
+				tf.layers.dense({units: 4, activation: 'elu'}),
 			]
 		});
 		
 		if (weights.length > 0) {
 			let tempArr = [];
-			tempArr[0] = weights[0].add(tf.scalar(Math.random() * .2));
-			tempArr[1] = weights[1].add(tf.scalar(Math.random() * .2));
+			if (Math.floor(Math.random() * 100) <= this.MutationChance) {
+				tempArr[0] = weights[0].add(tf.scalar(Math.random() * this.MutationRate));
+				tempArr[1] = weights[1].add(tf.scalar(Math.random() * this.MutationRate));
+			} else {
+				tempArr[0] = weights[0];
+				tempArr[1] = weights[1];
+			}
 
 			this.model.getLayer(null, 1).setWeights(tempArr);
 
-			tempArr[0] = weights[2].add(tf.scalar(Math.random() * .2));
-			tempArr[1] = weights[3].add(tf.scalar(Math.random() * .2));
+			if (Math.floor(Math.random() * 100) <= this.MutationChance) {
+				tempArr[0] = weights[2].add(tf.scalar(Math.random() * this.MutationRate));
+				tempArr[1] = weights[3].add(tf.scalar(Math.random() * this.MutationRate));
+			} else {
+				tempArr[0] = weights[2];
+				tempArr[1] = weights[3];
+			}
 
 			this.model.getLayer(null, 2).setWeights(tempArr);
+
+			if (Math.floor(Math.random() * 100) <= this.MutationChance) {
+				tempArr[0] = weights[4].add(tf.scalar(Math.random() * this.MutationRate));
+				tempArr[1] = weights[5].add(tf.scalar(Math.random() * this.MutationRate));
+			} else {
+				tempArr[0] = weights[4];
+				tempArr[1] = weights[5];
+			}
+
+			this.model.getLayer(null, 3).setWeights(tempArr);
+
+			if (Math.floor(Math.random() * 100) <= this.MutationChance) {
+				tempArr[0] = weights[6].add(tf.scalar(Math.random() * this.MutationRate));
+				tempArr[1] = weights[7].add(tf.scalar(Math.random() * this.MutationRate));
+			} else {
+				tempArr[0] = weights[6];
+				tempArr[1] = weights[7];
+			}
+
+			this.model.getLayer(null, 4).setWeights(tempArr);
 		}
 	}
 
+	calculateDeathMag() {
+		this.finalDistance= p5.Vector.dist(this.pos, this.startingPos);
+	}
+
 	drawShip() {
+		fill(this.fill);
 		let scale = 4/5;
 		let flexAngle = 0;
 		flexAngle += this.angle;
@@ -56,6 +101,7 @@ class Ship {
 	}
 
 	updateShipPos() {
+		if (this.vel.mag() < 0.01) this.stillCount++;
 		this.vel.mult(this.drag);
 		this.pos.add(this.vel);
 	}
@@ -89,12 +135,18 @@ class Ship {
 			switch (value) {
 				case 0:
 					this.accelShip();
+					this.fill='#f00';
 					break;
 				case 1:
 					this.turnShipLeft();
+					this.fill='#0f0';
 					break;
 				case 2:
 					this.turnShipRight();
+					this.fill='#00f';
+					break;
+				case 3:
+					this.fill='#fff';
 					break;
 			}
 		}
