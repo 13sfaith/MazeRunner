@@ -32,7 +32,8 @@ function draw() {
 
 	if (fleet.canRespawn) {
 		epoch++;
-		console.log(`Epoch: ${epoch}`);
+		//console.log(`Epoch: ${epoch}`);
+		document.getElementById("epochTitle").innerHTML = "EPOCH: " + epoch; 
 		tempWeights = fleet.weights;
 		rebuildLevel();
 	}

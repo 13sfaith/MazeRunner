@@ -5,8 +5,12 @@ class Fleet {
 		this.deadList = [];
 		this.boundaryManager = boundaryManager;
 
+		this.target = boundaryManager.getTargetVector();
+
 		this.weights = weights;
 		this.maxLife = 10;
+
+		this.greatestDistance = 0;
 
 		this.canRespawn = false;
 
@@ -33,9 +37,13 @@ class Fleet {
 		}
 
 		if (this.fleetList.length == 0) {
-			let modelB = this.deadList[this.count - 1];
-			this.deadList.sort( (a, b) => { return a.finalDistance > b.finalDistance })
-			let modelA = this.deadList[this.count - 1]
+			this.deadList.sort( (a, b) => { return a.finalDistance > b.finalDistance });
+			if (this.greatestDistance < this.deadList[this.deadList.length - 1].finalDistance) this.greatestDistance = this.deadList[this.deadList.length - 1].finalDistance;
+			let rh = new RepopulationHandler();
+			this.weights = rh.getNewWeights(this.deadList);
+			/*
+			let modelA = this.deadList[this.count - 1];
+			let modelB = this.deadList[this.count - 2];
 
 			let a = modelA.model.getLayer(null, 1).getWeights();
 			let b = modelB.model.getLayer(null, 1).getWeights();
@@ -63,6 +71,7 @@ class Fleet {
 
 			this.weights[6] = (b[0]);
 			this.weights[7] = (b[1]);
+			*/
 
 			this.canRespawn = true;
 		}
@@ -74,11 +83,12 @@ class Fleet {
 			this.fleetList[i].drawShip();
 			this.fleetList[i].updateShipPos();
 			this.fleetList[i].handleInput(control[i]);
+			this.fleetList[i].handleCellCount(this.boundaryManager.getCurCell(this.fleetList[i].pos));
 		}
 
 		for (let i = 0; i < this.fleetList.length; i++) {
 			if (!this.boundaryManager.isSafe(this.fleetList[i]) || this.fleetList[i].stillCount > this.maxLife) {
-				this.fleetList[i].calculateDeathMag();
+				this.fleetList[i].calculateDeathMag(this.target);
 				this.deadList.push(this.fleetList[i]);
 				this.fleetList.splice(i, 1);
 			}

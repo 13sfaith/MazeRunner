@@ -8,37 +8,51 @@ class Ship {
 		this.angle = Math.random() * (2 * PI);
 		this.turnSpeed = 0.08;
 		this.accel = 0.05;
-		this.topSpeed = 0.35;
+		this.topSpeed = 0.75;
 		this.drag = 0.99;
 		this.stillCount = 0;
 		this.points = { left: createVector(0, 0), right: createVector(0, 0), 
 			top: createVector(0, 0), bottom: createVector(0, 0) };
 
 		this.fill = '#fff';
+		this.curCell = -1;
+		this.cellList = [];
 			
-		this.MutationRate = .001;
-		this.MutationChance = 7;
+		this.MutationRate = .04;
+		this.MutationChance = 10;
 		this.model = tf.sequential({
 			layers: [
 				tf.layers.dense({batchInputShape: [1, 16], units: 30, activation: 'elu'}),
-				tf.layers.dense({units: 75, activation: 'relu'}),
-				tf.layers.dense({units: 85, activation: 'relu'}),
-				tf.layers.dense({units: 85, activation: 'relu'}),
-				tf.layers.dense({units: 70, activation: 'relu'}),
-				tf.layers.dense({units: 4, activation: 'elu'}),
+				tf.layers.dense({units: 100, activation: 'relu'}),
+				tf.layers.dense({units: 100, activation: 'relu'}),
+				tf.layers.dense({units: 100, activation: 'relu'}),
+				tf.layers.dense({units: 100, activation: 'relu'}),
+				tf.layers.dense({units: 4, activation: 'relu'}),
 			]
 		});
-		
-		if (weights.length > 0) {
-			let tempArr = [];
-			if (Math.floor(Math.random() * 100) <= this.MutationChance) {
-				tempArr[0] = weights[0].add(tf.scalar(Math.random() * this.MutationRate));
-				tempArr[1] = weights[1].add(tf.scalar(Math.random() * this.MutationRate));
-			} else {
-				tempArr[0] = weights[0];
-				tempArr[1] = weights[1];
-			}
 
+		if (weights.length > 0) {
+			let w = 0;
+			let tempArr = [];
+			for (let i = 1; i < this.model.layers.length - 1; i++)
+			{
+				if (Math.floor(Math.random() * 100) <= this.MutationChance) {
+					//tempArr[0] = weights[w].add(tf.scalar(Math.random() * this.MutationRate));
+					tempArr[0] = weights[w].add(tf.truncatedNormal(weights[w].shape, 0, this.MutationRate));
+					w++;
+					tempArr[1] = weights[w].add(tf.truncatedNormal(weights[w].shape, 0, this.MutationRate));
+					w++;
+				} else {
+					tempArr[0] = weights[w];
+					w++;
+					tempArr[1] = weights[w];
+					w++;
+				}
+
+				this.model.getLayer(null, i).setWeights(tempArr)
+			}
+		}
+			/*
 			this.model.getLayer(null, 1).setWeights(tempArr);
 
 			if (Math.floor(Math.random() * 100) <= this.MutationChance) {
@@ -70,11 +84,12 @@ class Ship {
 			}
 
 			this.model.getLayer(null, 4).setWeights(tempArr);
-		}
+			*/
 	}
 
-	calculateDeathMag() {
+	calculateDeathMag(target) {
 		this.finalDistance= p5.Vector.dist(this.pos, this.startingPos);
+		//this.finalDistance= p5.Vector.dist(this.pos, target);
 	}
 
 	drawShip() {
@@ -150,5 +165,12 @@ class Ship {
 					break;
 			}
 		}
+	}
+
+	handleCellCount(curCell) {
+		if (curCell.id != this.curCell && !this.cellList.includes(curCell.id)) {
+			this.cellList.push(curCell.id)
+		}
+
 	}
 }

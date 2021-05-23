@@ -72,5 +72,12 @@ class BoundaryManager {
 		let y = Math.floor(pos.y / this.maze.size);
 		return this.maze.cellList[x + (y * this.maze.cols)];
 	}
+
+	getTargetVector() {
+		let ret = createVector();
+		ret.y = (this.maze.size * (Math.floor(Math.random() * this.rows))) - (this.maze.size / 2);
+		ret.x = (this.maze.size * (Math.floor(Math.random() * this.cols))) - (this.maze.size / 2);
+		return ret;
+	}
 		
 }
