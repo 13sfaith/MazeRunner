@@ -8,7 +8,14 @@ class Maze {
 		this.cellList = [];
 		this.populateCellList();
 
+		this.randomChoice = Math.floor(Math.random() * (this.total - 1));
+		while (this.randomChoice == 0) {
+			this.randomChoice = Math.floor(Math.random() * (this.total - 1));
+		}
+		this.cellList[this.randomChoice].isEnd = true;
 		this.curCell = this.cellList[this.total - 1];
+
+		this.diagLen = Math.sqrt((rows * size) ** 2 + (cols * size) ** 2);
 	}
 
 	populateCellList() {
@@ -24,6 +31,10 @@ class Maze {
 		for (let j = 0; j < this.rows; j++)  {
 			for (let k = 0; k < this.cols; k++) {
 				let activeCell = this.cellList[(this.cols * j) + k];
+				if (activeCell.isEnd)
+					stroke(0, 255, 0);
+				else
+					stroke(255);
 				if (activeCell.walls.left)
 					line(k * this.size, j * this.size, k * this.size, (j+1) * this.size);
 				if (activeCell.walls.right)
@@ -32,17 +43,6 @@ class Maze {
 					line((k) * this.size, j * this.size, (k+1) * this.size, (j) * this.size);
 				if (activeCell.walls.bottom)
 					line((k) * this.size, (j+1) * this.size, (k+1) * this.size, (j+1) * this.size);
-				/*
-				let activeCell = this.cellList[(this.rows * j) + k];
-				if (activeCell.walls.left)
-					line(j * this.size, k * this.size, j * this.size, (k * this.size) + this.size);
-				if (activeCell.walls.right)
-					line((j * this.size) + this.size, k * this.size, (j * this.size) + this.size, (k * this.size) + this.size);
-				if (activeCell.walls.top)
-					line(j * this.size, k * this.size, (j * this.size) + this.size, k * this.size);
-				if (activeCell.walls.bottom)
-					line(j * this.size, (k * this.size) + this.size, (j * this.size) + this.size, (k * this.size) + this.size);
-				*/
 				
 			}
 		}

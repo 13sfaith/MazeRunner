@@ -4,5 +4,6 @@ class Cell {
 		this.id = id;
 		this.walls = {left: true, right: true, top: true, bottom: true}
 		this.pos = pos;
+		this.isEnd = false;
 	}
 }

@@ -5,11 +5,13 @@ class Ship {
 		this.finalDistance = createVector(0, 0);
 		this.size = size;
 		this.vel = createVector(0.0, 0.0); 
-		this.angle = Math.random() * (2 * PI);
-		this.turnSpeed = 0.08;
-		this.accel = 0.05;
-		this.topSpeed = 0.75;
-		this.drag = 0.99;
+		//this.angle = Math.random() * (2 * PI);
+		this.angle = (Math.random() * 3 * PI / 2) - (PI / 2);
+		this.angle = PI;
+		this.turnSpeed = 0.2;
+		this.accel = 0.15;
+		this.topSpeed = 2;
+		this.drag = 0.89;
 		this.stillCount = 0;
 		this.points = { left: createVector(0, 0), right: createVector(0, 0), 
 			top: createVector(0, 0), bottom: createVector(0, 0) };
@@ -18,16 +20,15 @@ class Ship {
 		this.curCell = -1;
 		this.cellList = [];
 			
-		this.MutationRate = .04;
-		this.MutationChance = 10;
+		this.MutationRate = .03;
+		this.MutationChance = 1;
 		this.model = tf.sequential({
 			layers: [
-				tf.layers.dense({batchInputShape: [1, 16], units: 30, activation: 'elu'}),
-				tf.layers.dense({units: 100, activation: 'relu'}),
-				tf.layers.dense({units: 100, activation: 'relu'}),
-				tf.layers.dense({units: 100, activation: 'relu'}),
-				tf.layers.dense({units: 100, activation: 'relu'}),
-				tf.layers.dense({units: 4, activation: 'relu'}),
+				//tf.layers.dense({batchInputShape: [1, 16], units: 30, activation: 'elu'}),
+				//tf.layers.dense({inputShape: [16], units: 12, activation: 'elu'}),
+				tf.layers.dense({inputShape: [6], units: 20, activation: 'elu'}),
+				tf.layers.dense({units: 20, activation: 'elu'}),
+				tf.layers.dense({units: 3, activation: 'elu'}),
 			]
 		});
 

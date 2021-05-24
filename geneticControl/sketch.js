@@ -10,7 +10,7 @@ function rebuildLevel() {
 
 	bounds = new BoundaryManager(maze);
 
-	fleet = new Fleet(10, bounds, tempWeights);
+	fleet = new Fleet(15, bounds, tempWeights);
 
 }
 
